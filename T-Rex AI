@@ -1,0 +1,126 @@
+from PIL import ImageGrab, ImageOps
+import pyautogui as autog
+import numpy as np
+import math
+
+global templist
+global mylist
+
+templist = [2838]
+mylist = [2838,2838]
+
+def shortKeyboardPress():
+    autog.keyDown('space') 
+    autog.keyDown('space')
+    autog.keyDown('space')
+    # autog.keyUp('space')
+
+
+def most_frequent(List): 
+    return max(set(List), key = List.count) 
+
+def screenShot(x=10):
+    # box = (221+x, 243, 344+x, 264)
+    box = (247+x, 374, 350+x, 409)
+    image = ImageGrab.grab(box)
+    image = ImageOps.grayscale(image)
+    arr = np.array(image.getcolors())
+    return arr.sum()
+
+
+def mainProgram(t):
+    global mylist
+    t = math.floor(t)
+    x = screenShot(t)
+    list_allocation(x)
+    
+
+
+def list_allocation(val):
+    global templist
+    global mylist
+    global step
+    
+    first_time_day = False
+    first_time_night = False
+
+    templist.append(val)
+
+    print(templist, '  ',mylist, '  ', step)
+
+    if len(templist)>4:
+        templist.pop(0)
+
+    if templist.count(2583) and mylist[0]==2838:
+        print('Changing to night mode!')
+        first_time_night = True
+        mylist[0]=2583
+
+    if templist.count(2838) and mylist[0]==2583:
+        print('Changing to day mode!')
+        first_time_day = True
+        mylist[0]=2838
+
+    
+    if val!=2583 and val!=2838:
+        mylist[1]=val
+    else:
+        mylist[1]=mylist[0]
+
+    # the big decision!  
+    if mylist[0] == 2838 and mylist[1]>mylist[0]:
+        if not first_time_day and not first_time_night:
+            shortKeyboardPress()
+            step = step + 0.25
+    
+    elif mylist[0] == 2583 and mylist[1]>mylist[0]:
+        if not first_time_day and not first_time_night:
+            shortKeyboardPress()
+            step = step + 0.25
+        
+
+
+defaultlist = []
+first_time = True
+target = 0
+step = -5.0000
+list_s = []
+
+
+def tester():
+    global first_time
+    global target
+    global step
+    global list_s
+
+    x = screenShot(math.floor(step))
+
+    if first_time:
+        print(x, ' ', defaultlist)
+        defaultlist.append(x)
+        if len(defaultlist)==5:
+            target = most_frequent(defaultlist)
+            print('Target is: ',target)
+            print('T-Rex is fully functional!')
+            first_time = False
+    
+    list_s.append(x)
+
+    if len(list_s) > 5:
+        list_s.pop(0)
+    
+    if not step > 204     :
+        print('memo', list_s,' ', x,' ',round(sum(list_s)/5,1) ,'\tSpeed is: ',round(step,2))
+    else:
+        print('memo', list_s,' ', round(sum(list_s)/5,1), '\tMaximum speed acquired!')
+
+    if x != target:
+        shortKeyboardPress()
+        if step < 205:
+            step += 0.9
+
+    
+
+while 1:
+    # mainProgram(step)
+    tester()
